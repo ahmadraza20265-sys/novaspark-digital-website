@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #03050d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(18, 200, 255, 0.22), transparent 28rem),
+    radial-gradient(circle at 82% 14%, rgba(255, 122, 24, 0.2), transparent 32rem),
+    linear-gradient(180deg, #02030a 0%, #060816 45%, #02030a 100%);
+  color: #f8fbff;
+}
+
+body::selection {
+  background: rgba(18, 200, 255, 0.32);
+}
+
+.glass {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045));
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(22px);
+}
+
+.neon-text {
+  background: linear-gradient(90deg, #12c8ff 0%, #f8fbff 38%, #ffbf38 66%, #ff7a18 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grid-mask {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.aurora {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(18, 200, 255, 0.42), transparent 24%),
+    radial-gradient(circle at 80% 42%, rgba(255, 122, 24, 0.42), transparent 26%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.18), transparent 18%);
+  filter: blur(42px);
+}
+
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  mix-blend-mode: screen;
+}
+
+.particle {
+  animation: drift 8s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(18px, -26px, 0) scale(1.35);
+    opacity: 0.85;
+  }
+}
+
+.loading-bar {
+  animation: load 1.3s ease-out forwards;
+}
+
+@keyframes load {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
