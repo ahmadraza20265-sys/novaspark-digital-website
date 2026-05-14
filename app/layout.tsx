@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Princess' Construction Inc | Premium Dallas Roofing",
+  title: "NovaSpark Digital Agency | AI-Powered Websites, Automation, and Content",
   description:
-    "Princess' Construction Inc is a premium Dallas roofing company for roof inspections, roof repairs, and roof installations."
+    "NovaSpark Digital Agency helps businesses grow with website development, AI automation, and content creation."
 };
 
 export default function RootLayout({

@@ -2,192 +2,213 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
-  Award,
-  BadgeCheck,
-  CalendarCheck,
-  Check,
-  ChevronRight,
-  Clock,
-  Hammer,
-  HardHat,
-  Home as HomeIcon,
-  MapPin,
+  Bot,
+  CheckCircle2,
+  Code2,
+  Facebook,
+  Github,
+  Instagram,
+  Mail,
   Menu,
   MessageCircle,
+  Palette,
   Phone,
+  Rocket,
   ShieldCheck,
+  Sparkles,
   Star,
-  X
+  X,
+  Zap
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
-const phoneDisplay = "+1 817-692-8614";
-const phoneHref = "tel:+18176928614";
+type Repo = {
+  id: number;
+  name: string;
+  description: string | null;
+  html_url: string;
+  language: string | null;
+  stargazers_count: number;
+  updated_at: string;
+};
+
+type ServiceImage = Record<string, string>;
+
+const phoneDisplay = "+92 3296104859";
 const whatsappHref =
-  "https://wa.me/18176928614?text=Hi%20Princess%27%20Construction%2C%20I%20would%20like%20a%20free%20roofing%20estimate.";
+  "https://wa.me/923296104859?text=Hi%20NovaSpark%20Digital%20Agency%2C%20I%20want%20to%20discuss%20a%20project.";
+const email = "novasparkahmad@gmail.com";
+const githubUsername = process.env.NEXT_PUBLIC_GITHUB_USERNAME || "";
+const unsplashKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY || "";
+
+const facebookUrl = "https://www.facebook.com/share/1JHhVV6DaT/";
+const instagramUrl = "https://www.instagram.com/digitalnovaspark?igsh=MXh4d3N0b2Q0eXhuMg==";
 
 const navItems = [
+  ["Hero", "home"],
+  ["About", "about"],
   ["Services", "services"],
-  ["Projects", "projects"],
-  ["Reviews", "reviews"],
+  ["Portfolio", "portfolio"],
   ["Contact", "contact"]
 ];
 
+const serviceImageFallbacks: ServiceImage = {
+  "Website Development":
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1100&q=80",
+  "AI Automation":
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1100&q=80",
+  "Content Creation":
+    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=1100&q=80"
+};
+
 const services = [
   {
-    icon: ShieldCheck,
-    title: "Roof Inspection",
-    copy: "Detailed roof assessments for storm damage, leaks, aging shingles, and insurance documentation.",
-    image: "/roof-inspection.jpg"
+    icon: Code2,
+    title: "Website Development",
+    query: "coding laptop ui development",
+    copy: "Fast, conversion-focused websites and web apps built with clean architecture, responsive UI, and deployment-ready performance."
   },
   {
-    icon: Hammer,
-    title: "Roof Repair",
-    copy: "Fast repairs for leaks, missing shingles, flashing issues, ventilation concerns, and emergency damage.",
-    image: "/roof-repair.jpg"
+    icon: Bot,
+    title: "AI Automation",
+    query: "artificial intelligence robotics automation",
+    copy: "AI workflows, chatbots, CRM automations, and operational systems that reduce repetitive work and improve response speed."
   },
   {
-    icon: HardHat,
-    title: "Roof Installation",
-    copy: "Premium roof replacements and new installations with architectural, metal, and commercial systems.",
-    image: "/roof-installation.jpg"
+    icon: Palette,
+    title: "Content Creation",
+    query: "creative design studio content",
+    copy: "Brand visuals, short-form content, landing page copy, and digital campaigns designed to attract and convert better clients."
   }
 ];
 
-const stats = [
-  ["20+", "Years in business"],
-  ["5.0", "Rated Dallas roofer"],
-  ["GAF", "Certified contractor"],
-  ["100%", "Quality workmanship focus"]
-];
-
-const projects = [
-  {
-    title: "Modern Residential Roof",
-    tag: "Installation",
-    image: "/roof-hero.jpg"
-  },
-  {
-    title: "Full Roof Replacement",
-    tag: "Before / After",
-    image: "/roof-installation.jpg"
-  },
-  {
-    title: "Garage Roofing System",
-    tag: "Repair + Shingles",
-    image: "/roof-repair.jpg"
-  },
-  {
-    title: "Exterior Construction Detail",
-    tag: "Construction",
-    image: "/construction-detail.jpg"
-  },
-  {
-    title: "Patio + Exterior Finish",
-    tag: "Construction",
-    image: "/patio-construction.jpg"
-  }
-];
-
-const reviews = [
-  "The quality of work is top-notch.",
-  "I trust her company and her staff.",
-  "Thank you for the quality workmanship."
-];
-
-const trustCards: { icon: LucideIcon; title: string; copy: string }[] = [
-  {
-    icon: Award,
-    title: "20+ years experience",
-    copy: "In business since 2001 with residential and commercial project knowledge."
-  },
-  {
-    icon: MapPin,
-    title: "Dallas roofing expert",
-    copy: "Local service from 3737 Atlanta St, Dallas, TX 75215."
-  },
-  {
-    icon: BadgeCheck,
-    title: "Certified contractor",
-    copy: "GAF certified and skilled in architectural, metal, and TPO roofing."
-  },
-  {
-    icon: Star,
-    title: "Customer satisfaction",
-    copy: "Built around quality workmanship, clean communication, and trust."
-  }
+const whyUs = [
+  ["AI-first execution", "Modern automation and creative tooling baked into every growth system."],
+  ["Conversion focus", "Every section, CTA, and interaction is designed around client inquiries."],
+  ["Clean delivery", "Optimized builds, mobile-first layouts, and Vercel-ready deployment practices."],
+  ["Business clarity", "Strategy, design, development, and content aligned to one measurable goal."]
 ];
 
 const reveal = {
-  hidden: { opacity: 0, y: 26 },
+  hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 }
 };
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [repos, setRepos] = useState<Repo[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [serviceImages, setServiceImages] = useState<ServiceImage>(serviceImageFallbacks);
+  const [formState, setFormState] = useState("Send Message");
 
-  function submitQuote(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    let active = true;
+    const userEndpoint = `https://api.github.com/users/${githubUsername}/repos?sort=updated&direction=desc&per_page=9`;
+    const searchEndpoint =
+      "https://api.github.com/search/repositories?q=topic:web-development+topic:ai&sort=updated&order=desc&per_page=9";
+    const endpoint = githubUsername ? userEndpoint : searchEndpoint;
+
+    fetch(endpoint, { headers: { Accept: "application/vnd.github+json" } })
+      .then((response) => {
+        if (!response.ok) throw new Error("GitHub API request failed");
+        return response.json();
+      })
+      .then((data) => {
+        const items = Array.isArray(data) ? data : data.items;
+        if (active && Array.isArray(items)) setRepos(items.slice(0, 9));
+      })
+      .catch(() => {
+        if (active) setRepos([]);
+      })
+      .finally(() => {
+        if (active) setProjectsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!unsplashKey) return;
+
+    let active = true;
+    Promise.all(
+      services.map(async (service) => {
+        const response = await fetch(
+          `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+            service.query
+          )}&per_page=1&orientation=landscape&client_id=${unsplashKey}`
+        );
+        if (!response.ok) return [service.title, serviceImageFallbacks[service.title]];
+        const data = await response.json();
+        return [service.title, data.results?.[0]?.urls?.regular || serviceImageFallbacks[service.title]];
+      })
+    )
+      .then((entries) => {
+        if (active) setServiceImages(Object.fromEntries(entries));
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function submitContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const name = String(data.get("name") || "Website visitor");
-    const service = String(data.get("service") || "roofing");
-    const message = encodeURIComponent(
-      `Hi Princess' Construction, my name is ${name}. I need help with ${service}. Please contact me for a free roofing estimate.`
-    );
-    window.location.href = `${whatsappHref.split("?")[0]}?text=${message}`;
+    setFormState("Message Ready");
+    window.setTimeout(() => setFormState("Send Message"), 2200);
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-charcoal text-stone-50">
-      <div className="grain pointer-events-none fixed inset-0 z-50 opacity-[0.06]" />
+    <main className="min-h-screen overflow-hidden bg-ink text-slate-50">
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_18%_18%,rgba(0,194,255,0.18),transparent_24rem),radial-gradient(circle_at_84%_20%,rgba(255,122,24,0.18),transparent_25rem),linear-gradient(180deg,#05070d_0%,#080b14_48%,#05070d_100%)]" />
+      <div className="grain pointer-events-none fixed inset-0 z-50 opacity-[0.045]" />
 
-      <header className="fixed left-0 right-0 top-0 z-40 border-b border-white/10 bg-charcoal/82 backdrop-blur-2xl">
+      <header className="fixed left-0 right-0 top-0 z-40 border-b border-white/10 bg-ink/78 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <a href="#home" className="flex items-center gap-3" aria-label="Princess' Construction home">
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-gold/40 bg-gold/10 text-gold shadow-gold">
-              <HomeIcon size={23} />
-            </span>
+          <a href="#home" className="flex items-center gap-3" aria-label="NovaSpark Digital home">
+            <Image
+              src="/nova-spark-logo.jpeg"
+              alt="NovaSpark Digital logo"
+              width={52}
+              height={52}
+              priority
+              className="h-12 w-12 rounded-lg border border-cyan/40 object-cover shadow-cyan"
+            />
             <span>
-              <span className="block font-display text-lg font-black leading-none tracking-wide">
-                Princess&apos; Construction
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400">
-                Dallas Roofing
-              </span>
+              <span className="block font-display text-lg font-black leading-none">NovaSpark Digital</span>
+              <span className="text-xs font-bold uppercase tracking-[0.24em] text-cyan">AI Growth Agency</span>
             </span>
           </a>
 
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-stone-300 lg:flex">
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-300 lg:flex">
             {navItems.map(([label, id]) => (
-              <a key={id} href={`#${id}`} className="transition hover:text-gold">
+              <a key={id} href={`#${id}`} className="transition hover:text-cyan">
                 {label}
               </a>
             ))}
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <a
-              href={phoneHref}
-              className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2.5 text-sm font-bold transition hover:border-gold/60 hover:text-gold"
-            >
-              <Phone size={16} />
-              {phoneDisplay}
-            </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-black text-black shadow-gold transition hover:-translate-y-0.5 hover:bg-amber-300"
-            >
-              Free Inspection
-              <ArrowRight size={16} />
+            <SocialLink href={facebookUrl} label="Facebook">
+              <Facebook size={17} />
+            </SocialLink>
+            <SocialLink href={instagramUrl} label="Instagram">
+              <Instagram size={17} />
+            </SocialLink>
+            <a href="#contact" className="btn-primary">
+              Get Started
+              <ArrowRight size={17} />
             </a>
           </div>
 
           <button
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/6 lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/12 bg-white/6 lg:hidden"
             aria-label="Toggle navigation"
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -195,7 +216,7 @@ export default function Home() {
         </div>
 
         {menuOpen && (
-          <div className="border-t border-white/10 bg-charcoal/96 px-4 py-4 lg:hidden">
+          <div className="border-t border-white/10 bg-ink/96 px-4 py-4 lg:hidden">
             <div className="mx-auto grid max-w-7xl gap-3">
               {navItems.map(([label, id]) => (
                 <a
@@ -207,61 +228,43 @@ export default function Home() {
                   {label}
                 </a>
               ))}
-              <a href={phoneHref} className="rounded-lg bg-gold px-4 py-3 text-center font-black text-black">
-                Call Now
-              </a>
+              <div className="flex gap-3">
+                <SocialLink href={facebookUrl} label="Facebook">
+                  <Facebook size={17} />
+                </SocialLink>
+                <SocialLink href={instagramUrl} label="Instagram">
+                  <Instagram size={17} />
+                </SocialLink>
+              </div>
             </div>
           </div>
         )}
       </header>
 
-      <section id="home" className="relative flex min-h-[94vh] items-center overflow-hidden px-4 pb-16 pt-28 sm:px-6 lg:px-8">
-        <Image
-          src="/roof-hero.jpg"
-          alt="Premium residential roof completed by Princess' Construction"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/76 to-black/30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_32%,rgba(217,164,65,0.24),transparent_30rem)]" />
-
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+      <section id="home" className="relative flex min-h-[92vh] items-center px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-ink to-transparent" />
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <motion.div initial="hidden" animate="visible" variants={reveal} transition={{ duration: 0.7 }}>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-gold/35 bg-black/35 px-4 py-2 text-sm font-bold text-gold backdrop-blur">
-              <BadgeCheck size={16} />
-              GAF Certified Dallas Roofing Contractor
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan/35 bg-cyan/10 px-4 py-2 text-sm font-bold text-cyan backdrop-blur">
+              <Sparkles size={16} />
+              Website Development + AI Automation + Content Creation
             </div>
-            <h1 className="max-w-4xl font-display text-5xl font-black leading-[0.96] sm:text-6xl lg:text-7xl">
-              Premium Roofing Built For Dallas Homes That Need It Done Right.
+            <h1 className="max-w-5xl font-display text-4xl font-black leading-[1.02] sm:text-6xl lg:text-7xl">
+              Build Your Digital Future with AI-Powered Solutions
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-200">
-              Princess&apos; Construction Inc delivers roof inspections, repairs, and installations with
-              high-end craftsmanship, fast response, and trusted local expertise from 3737 Atlanta St,
-              Dallas, TX.
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+              NovaSpark Digital Agency helps businesses grow with Website Development, AI Automation, and
+              Content Creation.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#contact"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-gold px-7 py-4 font-black text-black shadow-gold transition hover:-translate-y-1 hover:bg-amber-300"
-              >
-                Get Free Inspection
-                <ArrowRight className="transition group-hover:translate-x-1" size={19} />
+              <a href="#contact" className="btn-primary justify-center px-7 py-4 text-base">
+                Get Started
+                <Rocket size={19} />
               </a>
-              <a
-                href={phoneHref}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/18 bg-white/8 px-7 py-4 font-bold text-white backdrop-blur transition hover:border-gold/60 hover:text-gold"
-              >
-                <Clock size={19} />
-                Emergency Roofing CTA
+              <a href="#contact" className="btn-secondary justify-center px-7 py-4 text-base">
+                Contact Us
+                <MessageCircle size={19} />
               </a>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-3 text-sm font-semibold text-stone-200">
-              {["Storm damage help", "Residential roofing", "Commercial systems"].map((item) => (
-                <span key={item} className="rounded-full border border-white/12 bg-black/35 px-4 py-2 backdrop-blur">
-                  {item}
-                </span>
-              ))}
             </div>
           </motion.div>
 
@@ -269,57 +272,56 @@ export default function Home() {
             initial={{ opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.75, delay: 0.12 }}
-            className="luxury-panel ml-auto w-full max-w-md p-5 sm:p-6"
+            className="glass-panel relative overflow-hidden p-5 sm:p-7"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-5">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.24em] text-gold">Rapid Response</p>
-                <h2 className="mt-2 font-display text-3xl font-black">Free Roof Estimate</h2>
-              </div>
-              <span className="rounded-full bg-gold/12 p-3 text-gold">
-                <Phone size={25} />
-              </span>
-            </div>
-            <div className="mt-5 grid gap-3">
-              {["Inspect hail, wind, and leak damage", "Document roof condition clearly", "Recommend repair or replacement path"].map(
-                (item) => (
-                  <div key={item} className="flex items-center gap-3 text-stone-200">
-                    <Check className="text-gold" size={18} />
-                    {item}
+            <div className="absolute right-0 top-0 h-48 w-48 bg-orange/20 blur-3xl" />
+            <div className="absolute bottom-0 left-0 h-48 w-48 bg-cyan/20 blur-3xl" />
+            <div className="relative">
+              <Image
+                src="/nova-spark-logo.jpeg"
+                alt="NovaSpark Digital brand mark"
+                width={720}
+                height={720}
+                className="aspect-square w-full rounded-lg object-cover"
+                priority
+              />
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {["Launch", "Automate", "Scale"].map((item) => (
+                  <div key={item} className="rounded-lg border border-white/10 bg-white/[0.06] p-4 text-center">
+                    <p className="font-display text-xl font-black text-white">{item}</p>
                   </div>
-                )
-              )}
+                ))}
+              </div>
             </div>
-            <a
-              href={phoneHref}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-5 py-4 font-black text-black transition hover:bg-gold"
-            >
-              Click To Call {phoneDisplay}
-            </a>
           </motion.div>
         </div>
       </section>
 
-      <section className="relative z-10 border-y border-white/10 bg-black/26 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map(([number, label], index) => (
-            <motion.div
-              key={label}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={reveal}
-              transition={{ duration: 0.5, delay: index * 0.06 }}
-              className="rounded-lg border border-white/10 bg-white/[0.045] p-5 text-center transition hover:-translate-y-1 hover:border-gold/50"
-            >
-              <div className="font-display text-4xl font-black text-gold">{number}</div>
-              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-stone-400">{label}</p>
-            </motion.div>
-          ))}
+      <Section id="about" eyebrow="About" title="A focused digital agency for businesses that need modern systems, not just pretty pages.">
+        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="glass-panel p-6 sm:p-8">
+            <p className="text-lg leading-8 text-slate-300">
+              NovaSpark Digital Agency blends premium web design, practical AI automation, and content strategy
+              into one client acquisition engine. The goal is simple: make your brand easier to trust, contact,
+              and buy from.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              ["3", "Core services"],
+              ["24/7", "Digital presence"],
+              ["AI", "Workflow advantage"]
+            ].map(([number, label]) => (
+              <div key={label} className="glass-panel p-6 text-center">
+                <div className="font-display text-4xl font-black text-cyan">{number}</div>
+                <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-slate-400">{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
+      </Section>
 
-      <Section id="services" eyebrow="Roofing Services" title="High-trust roofing services built around speed, clarity, and premium workmanship.">
+      <Section id="services" eyebrow="Services" title="Three high-impact services delivered in the order your business needs them.">
         <div className="grid gap-5 lg:grid-cols-3">
           {services.map((service, index) => (
             <motion.article
@@ -329,204 +331,154 @@ export default function Home() {
               viewport={{ once: true, margin: "-80px" }}
               variants={reveal}
               transition={{ duration: 0.55, delay: index * 0.08 }}
-              className="group overflow-hidden rounded-lg border border-white/10 bg-white/[0.045] transition hover:-translate-y-2 hover:border-gold/55 hover:shadow-gold"
+              className="group glass-card overflow-hidden"
             >
-              <div className="relative h-56 overflow-hidden">
-                <Image src={service.image} alt={service.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <div className="absolute bottom-4 left-4 rounded-lg bg-gold p-3 text-black">
+              <div className="relative aspect-[16/10] overflow-hidden">
+                <img
+                  src={serviceImages[service.title]}
+                  alt={`${service.title} visual`}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent" />
+                <div className="absolute bottom-4 left-4 rounded-lg bg-cyan p-3 text-ink shadow-cyan">
                   <service.icon size={25} />
                 </div>
               </div>
               <div className="p-6">
                 <h3 className="font-display text-2xl font-black">{service.title}</h3>
-                <p className="mt-3 leading-7 text-stone-300">{service.copy}</p>
-                <a href="#contact" className="mt-6 inline-flex items-center gap-2 font-bold text-gold">
-                  Request service <ChevronRight size={17} className="transition group-hover:translate-x-1" />
-                </a>
+                <p className="mt-3 leading-7 text-slate-300">{service.copy}</p>
               </div>
             </motion.article>
           ))}
         </div>
       </Section>
 
-      <CtaBand
-        title="Roof leak, storm damage, or missing shingles?"
-        copy="Get a fast Dallas roof inspection before small damage becomes an expensive interior repair."
-        button="Call For Emergency Help"
-        href={phoneHref}
-      />
+      <CtaBand title="Ready to turn attention into qualified leads?" button="Start Your Project" href="#contact" />
 
-      <Section id="trust" eyebrow="Trust Indicators" title="A premium contractor experience from first call to final cleanup.">
-        <div className="grid gap-5 lg:grid-cols-4">
-          {trustCards.map(({ icon: Icon, title, copy }) => (
-            <div key={title} className="luxury-panel p-6 transition hover:-translate-y-1 hover:border-gold/50">
-              <span className="mb-5 inline-flex rounded-lg bg-gold/12 p-3 text-gold">
-                <Icon size={25} />
+      <Section id="why" eyebrow="Why Choose Us" title="Premium execution for brands that want a sharper digital edge.">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {whyUs.map(([title, copy], index) => (
+            <div key={title} className="glass-panel p-6 transition hover:-translate-y-1 hover:border-cyan/55">
+              <span className="mb-5 inline-flex rounded-lg bg-orange/12 p-3 text-orange">
+                {[Zap, Star, ShieldCheck, CheckCircle2][index]({ size: 25 })}
               </span>
               <h3 className="font-display text-xl font-black">{title}</h3>
-              <p className="mt-3 leading-7 text-stone-300">{copy}</p>
+              <p className="mt-3 leading-7 text-slate-300">{copy}</p>
             </div>
           ))}
         </div>
       </Section>
 
-      <Section id="projects" eyebrow="Project Showcase" title="Modern roofing and construction work presented with the confidence premium buyers expect.">
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
-          {projects.map((project, index) => (
-            <motion.article
-              key={project.title}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={reveal}
-              transition={{ duration: 0.55, delay: index * 0.05 }}
-              className={`group relative h-80 overflow-hidden rounded-lg border border-white/10 ${
-                index === 1 ? "lg:col-span-2" : ""
-              } ${index === 0 ? "md:col-span-2 lg:col-span-2" : ""}`}
-            >
-              <Image src={project.image} alt={project.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5">
-                <span className="rounded-full border border-gold/40 bg-gold/12 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-gold">
-                  {project.tag}
-                </span>
-                <h3 className="mt-3 font-display text-2xl font-black">{project.title}</h3>
-              </div>
-            </motion.article>
-          ))}
-        </div>
+      <Section id="portfolio" eyebrow="Portfolio" title="Real public repositories loaded dynamically from the GitHub API.">
+        {projectsLoading || repos.length === 0 ? (
+          <div className="glass-panel p-8 text-center text-lg font-semibold text-slate-300">Projects loading...</div>
+        ) : (
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {repos.map((repo, index) => (
+              <motion.article
+                key={repo.id}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={reveal}
+                transition={{ duration: 0.5, delay: index * 0.04 }}
+                className="glass-card flex min-h-64 flex-col p-6"
+              >
+                <div className="mb-5 flex items-center justify-between gap-3">
+                  <span className="rounded-lg bg-cyan/12 p-3 text-cyan">
+                    <Github size={23} />
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-300">
+                    <Star size={14} />
+                    {repo.stargazers_count ?? 0}
+                  </span>
+                </div>
+                <h3 className="font-display text-2xl font-black">{repo.name}</h3>
+                <p className="mt-3 line-clamp-3 flex-1 leading-7 text-slate-300">
+                  {repo.description || "Public GitHub repository with active source code and project history."}
+                </p>
+                <div className="mt-5 flex items-center justify-between gap-4">
+                  <span className="text-sm font-bold uppercase tracking-[0.16em] text-orange">
+                    {repo.language || "Code"}
+                  </span>
+                  <a href={repo.html_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-bold text-cyan">
+                    GitHub
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        )}
       </Section>
 
-      <Section id="reviews" eyebrow="Customer Reviews" title="Dallas homeowners choose Princess' Construction for workmanship they can trust.">
-        <div className="grid gap-5 lg:grid-cols-3">
-          {reviews.map((review) => (
-            <div key={review} className="luxury-panel p-7">
-              <div className="mb-5 flex gap-1 text-gold">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} size={18} fill="currentColor" />
-                ))}
-              </div>
-              <p className="font-display text-2xl font-bold leading-snug">&quot;{review}&quot;</p>
-              <p className="mt-5 text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">Verified customer feedback</p>
+      <Section id="contact" eyebrow="Contact" title="Tell NovaSpark Digital what you want to build next.">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="grid gap-5">
+            <ContactCard icon={Phone} label="Phone / WhatsApp" value={phoneDisplay} href={whatsappHref} />
+            <ContactCard icon={Mail} label="Email" value={email} href={`mailto:${email}`} />
+            <div className="glass-panel p-6">
+              <h3 className="font-display text-2xl font-black">Direct response channels</h3>
+              <p className="mt-3 leading-7 text-slate-300">
+                Use WhatsApp for fast project discussions or email your requirements for website, automation, and
+                content work.
+              </p>
             </div>
-          ))}
-        </div>
-      </Section>
+          </div>
 
-      <CtaBand
-        title="A better roof starts with one clear inspection."
-        copy="Tell us what happened, where you are in Dallas, and how quickly you need service."
-        button="Get Free Roofing Estimate"
-        href="#contact"
-      />
-
-      <Section id="contact" eyebrow="Contact" title="Request a quote from Princess' Construction Inc.">
-        <div className="grid gap-8 lg:grid-cols-[1.04fr_0.96fr]">
-          <form onSubmit={submitQuote} className="luxury-panel p-6 sm:p-8">
+          <form onSubmit={submitContact} className="glass-panel p-6 sm:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field name="name" label="Name" placeholder="Your name" required />
-              <Field name="phone" label="Phone" placeholder="Your phone number" />
+              <Field name="email" label="Email" placeholder="name@email.com" required type="email" />
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field name="email" label="Email" placeholder="name@email.com" />
-              <label className="block text-sm font-bold text-stone-200">
-                Service Needed
-                <select
-                  name="service"
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-black/35 px-4 py-3 text-white outline-none transition focus:border-gold"
-                >
-                  <option>Roof Inspection</option>
-                  <option>Roof Repair</option>
-                  <option>Roof Installation</option>
-                  <option>Emergency Roofing</option>
-                </select>
-              </label>
-            </div>
-            <label className="mt-4 block text-sm font-bold text-stone-200">
-              Project Details
+            <label className="mt-4 block text-sm font-bold text-slate-200">
+              Message
               <textarea
-                name="details"
-                rows={5}
-                placeholder="Tell us about leaks, storm damage, roof age, or your installation needs."
-                className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-black/35 px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-gold"
+                name="message"
+                rows={6}
+                placeholder="Tell us about your business, goals, timeline, and the service you need."
+                required
+                className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-black/35 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan"
               />
             </label>
-            <button className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gold px-6 py-4 font-black text-black shadow-gold transition hover:-translate-y-0.5 hover:bg-amber-300">
-              Send Quote Request
+            <button className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan px-6 py-4 font-black text-ink shadow-cyan transition hover:-translate-y-0.5 hover:bg-white">
+              {formState}
               <ArrowRight size={18} />
             </button>
           </form>
-
-          <div className="grid gap-5">
-            <ContactCard icon={Phone} label="Click To Call" value={phoneDisplay} href={phoneHref} />
-            <ContactCard icon={MessageCircle} label="WhatsApp" value="Get Free Roofing Estimate" href={whatsappHref} />
-            <ContactCard icon={MapPin} label="Dallas Location" value="3737 Atlanta St, Dallas, TX 75215" href="https://maps.google.com/?q=3737+Atlanta+St,+Dallas,+TX+75215" />
-            <div className="relative min-h-64 overflow-hidden rounded-lg border border-white/10">
-              <Image src="/patio-construction.jpg" alt="Princess' Construction exterior project" fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5">
-                <p className="text-sm font-bold uppercase tracking-[0.22em] text-gold">Serving Dallas, Texas</p>
-                <h3 className="mt-2 font-display text-3xl font-black">Roofing leads get fast response.</h3>
-              </div>
-            </div>
-          </div>
         </div>
       </Section>
 
-      <footer className="border-t border-white/10 bg-black/30 px-4 pb-28 pt-10 sm:px-6 md:pb-10 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-gold/40 bg-gold/10 text-gold">
-                <HomeIcon size={23} />
-              </span>
-              <span className="font-display text-xl font-black">Princess&apos; Construction Inc</span>
-            </div>
-            <p className="mt-4 max-w-md leading-7 text-stone-400">
-              Premium Dallas roofing company for roof inspection, roof repair, roof installation, and construction work.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-display text-lg font-black">Services</h4>
-            <div className="mt-4 grid gap-2 text-stone-400">
-              {services.map((service) => (
-                <a key={service.title} href="#services" className="hover:text-gold">
-                  {service.title}
-                </a>
-              ))}
+      <footer className="border-t border-white/10 bg-black/25 px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/nova-spark-logo.jpeg"
+              alt="NovaSpark Digital logo"
+              width={46}
+              height={46}
+              className="h-11 w-11 rounded-lg border border-cyan/35 object-cover"
+            />
+            <div>
+              <p className="font-display text-lg font-black">NovaSpark Digital Agency</p>
+              <p className="text-sm text-slate-400">AI-powered digital growth systems.</p>
             </div>
           </div>
-          <div>
-            <h4 className="font-display text-lg font-black">Contact</h4>
-            <div className="mt-4 grid gap-2 text-stone-400">
-              <a href={phoneHref} className="hover:text-gold">{phoneDisplay}</a>
-              <span>3737 Atlanta St, Dallas, TX 75215</span>
-              <a href={whatsappHref} className="hover:text-gold">Chat With Us</a>
-            </div>
+          <div className="flex items-center gap-3">
+            <SocialLink href={facebookUrl} label="Facebook">
+              <Facebook size={17} />
+            </SocialLink>
+            <SocialLink href={instagramUrl} label="Instagram">
+              <Instagram size={17} />
+            </SocialLink>
+            <a href={whatsappHref} target="_blank" rel="noreferrer" className="btn-secondary">
+              WhatsApp
+              <MessageCircle size={17} />
+            </a>
           </div>
         </div>
       </footer>
-
-      <div className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-2 border-t border-white/10 bg-charcoal/96 p-3 backdrop-blur md:hidden">
-        <a href={phoneHref} className="mr-1 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 font-black text-black">
-          <Phone size={17} />
-          Call
-        </a>
-        <a href={whatsappHref} className="ml-1 inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-4 py-3 font-black text-black">
-          <MessageCircle size={17} />
-          WhatsApp
-        </a>
-      </div>
-
-      <a
-        href={whatsappHref}
-        className="whatsapp-float fixed bottom-24 right-5 z-50 hidden items-center gap-3 rounded-full bg-[#25d366] px-5 py-4 font-black text-black shadow-[0_18px_55px_rgba(37,211,102,0.35)] transition hover:-translate-y-1 hover:scale-[1.02] md:flex"
-        aria-label="Chat with Princess' Construction on WhatsApp"
-      >
-        <MessageCircle size={22} />
-        Chat With Us
-      </a>
     </main>
   );
 }
@@ -540,7 +492,7 @@ function Section({
   id: string;
   eyebrow: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section id={id} className="relative z-10 px-4 py-20 sm:px-6 lg:px-8">
@@ -553,7 +505,7 @@ function Section({
           transition={{ duration: 0.6 }}
           className="mb-10 max-w-3xl"
         >
-          <div className="mb-4 inline-flex rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-sm font-black uppercase tracking-[0.18em] text-gold">
+          <div className="mb-4 inline-flex rounded-full border border-cyan/30 bg-cyan/10 px-4 py-2 text-sm font-black uppercase tracking-[0.18em] text-cyan">
             {eyebrow}
           </div>
           <h2 className="font-display text-3xl font-black leading-tight sm:text-5xl">{title}</h2>
@@ -568,38 +520,38 @@ function Field({
   name,
   label,
   placeholder,
-  required = false
+  required = false,
+  type = "text"
 }: {
   name: string;
   label: string;
   placeholder: string;
   required?: boolean;
+  type?: string;
 }) {
   return (
-    <label className="block text-sm font-bold text-stone-200">
+    <label className="block text-sm font-bold text-slate-200">
       {label}
       <input
         name={name}
+        type={type}
         placeholder={placeholder}
         required={required}
-        className="mt-2 w-full rounded-lg border border-white/10 bg-black/35 px-4 py-3 text-white outline-none transition placeholder:text-stone-500 focus:border-gold"
+        className="mt-2 w-full rounded-lg border border-white/10 bg-black/35 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan"
       />
     </label>
   );
 }
 
-function CtaBand({ title, copy, button, href }: { title: string; copy: string; button: string; href: string }) {
+function CtaBand({ title, button, href }: { title: string; button: string; href: string }) {
   return (
     <section className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg border border-gold/25 bg-gold/10 p-6 shadow-gold sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg border border-orange/30 bg-orange/10 p-6 shadow-orange sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="font-display text-3xl font-black">{title}</h2>
-          <p className="mt-2 max-w-2xl text-stone-300">{copy}</p>
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-orange">Client acquisition starts here</p>
+          <h2 className="mt-2 font-display text-3xl font-black">{title}</h2>
         </div>
-        <a
-          href={href}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-gold px-6 py-4 font-black text-black transition hover:-translate-y-0.5 hover:bg-amber-300"
-        >
+        <a href={href} className="btn-primary shrink-0 justify-center px-6 py-4">
           {button}
           <ArrowRight size={18} />
         </a>
@@ -620,15 +572,34 @@ function ContactCard({
   href: string;
 }) {
   return (
-    <a href={href} className="group luxury-panel flex items-center gap-4 p-5 transition hover:-translate-y-1 hover:border-gold/55">
-      <span className="rounded-lg bg-gold/12 p-4 text-gold">
+    <a
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noreferrer" : undefined}
+      className="group glass-panel flex items-center gap-4 p-5 transition hover:-translate-y-1 hover:border-cyan/55"
+    >
+      <span className="rounded-lg bg-cyan/12 p-4 text-cyan">
         <Icon size={25} />
       </span>
-      <span>
-        <span className="block text-sm font-bold uppercase tracking-[0.18em] text-stone-500">{label}</span>
-        <span className="mt-1 block font-display text-xl font-black">{value}</span>
+      <span className="min-w-0">
+        <span className="block text-sm font-bold uppercase tracking-[0.18em] text-slate-500">{label}</span>
+        <span className="mt-1 block break-words font-display text-xl font-black">{value}</span>
       </span>
-      <ArrowRight className="ml-auto text-gold transition group-hover:translate-x-1" size={19} />
+      <ArrowRight className="ml-auto hidden shrink-0 text-cyan transition group-hover:translate-x-1 sm:block" size={19} />
+    </a>
+  );
+}
+
+function SocialLink({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className="inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/6 px-3 text-slate-200 transition hover:-translate-y-0.5 hover:border-cyan/60 hover:text-cyan"
+    >
+      {children}
     </a>
   );
 }
